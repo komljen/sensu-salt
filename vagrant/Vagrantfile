@@ -1,0 +1,58 @@
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "precise64"
+  config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/precise/current/precise-server-cloudimg-amd64-vagrant-disk1.box"
+
+  # Salt master
+  config.vm.define "master" do |node|
+    node.vm.hostname = "master"
+    node.vm.network :private_network, ip: "192.168.33.10"
+    node.vm.network "forwarded_port", guest: 3000, host: 3000
+
+    node.vm.synced_folder "../salt/", "/srv/salt"
+    node.vm.synced_folder "../pillar/", "/srv/pillar"
+
+    # salt-master provisioning
+    node.vm.provision :salt do |salt|
+      salt.install_master = true
+      salt.run_highstate = false
+      salt.master_key = 'keys/master.pem'
+      salt.master_pub = 'keys/master.pub'
+
+      salt.minion_config = "configs/minion"
+      salt.minion_key = 'keys/master.pem'
+      salt.minion_pub = 'keys/master.pub'
+
+      salt.seed_master = {
+        'node01' => 'keys/node01.pub',
+        'node02' => 'keys/node02.pub',
+        'master' => 'keys/master.pub'
+      }
+    end
+  end
+
+  config.vm.define "node01" do |node|
+    node.vm.hostname = "node01"
+    node.vm.network :private_network, ip: "192.168.33.20"
+
+    # salt-minion provisioning
+    node.vm.provision :salt do |salt|
+      salt.minion_config = "configs/minion"
+      salt.minion_key = 'keys/node01.pem'
+      salt.minion_pub = 'keys/node01.pub'
+    end
+  end
+
+  config.vm.define "node02" do |node|
+    node.vm.hostname = "node02"
+    node.vm.network :private_network, ip: "192.168.33.30"
+
+    # salt-minion provisioning
+    node.vm.provision :salt do |salt|
+      salt.minion_config = "configs/minion"
+      salt.minion_key = 'keys/node02.pem'
+      salt.minion_pub = 'keys/node02.pub'
+    end
+  end
+end

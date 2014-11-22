@@ -3,19 +3,20 @@
     {
       "name": "Sensu",
       "host": "localhost",
-      "ssl": "",
       "port": 4567,
+      "ssl": false,
+      "insecure": false,
       "user": "",
       "pass": "",
       "path": "",
-      "timeout": 5000
+      "timeout": 5
     }
   ],
   "uchiwa": {
+    "host": "0.0.0.0",
+    "port": {{ salt['pillar.get']('sensu:server:dashboard:uchiwa:port') }},
     "user": "{{ salt['pillar.get']('sensu:server:dashboard:uchiwa:user') }}",
     "pass": "{{ salt['pillar.get']('sensu:server:dashboard:uchiwa:password') }}",
-    "port": {{ salt['pillar.get']('sensu:server:dashboard:uchiwa:port') }},
-    "stats": 10,
-    "refresh": 10000
+    "refresh": 5
   }
 }

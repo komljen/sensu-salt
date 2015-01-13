@@ -2,7 +2,6 @@ Deploy Sensu monitoring tool with SaltStack
 =========
 
 Salt states for Sensu server (with Uchiwa dashboard) and clients deployment.
-Tested on Ubuntu 12.04.
 
 Test environment with Vagrant
 ==============
